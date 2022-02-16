@@ -1,0 +1,94 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileSdk ConfigData.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.yusufarisoy.composeapp"
+        minSdk ConfigData.minSdkVersion
+        targetSdk ConfigData.targetSdkVersion
+        versionCode ConfigData.versionCode
+        versionName ConfigData.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion Versions.compose
+        kotlinCompilerVersion '1.6.10'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+
+    implementation Libs.coreKtx
+    implementation Libs.appCompat
+    implementation Libs.material
+    //Compose
+    implementation Libs.composeUi
+    implementation Libs.composeMaterial
+    implementation Libs.composeTooling
+    implementation Libs.activityCompose
+    implementation Libs.hiltNavigationCompose
+    implementation Libs.navigationCompose
+    implementation Libs.constraintLayoutCompose
+    //Test
+    testImplementation Libs.testJunit
+    androidTestImplementation Libs.testExtJunit
+    androidTestImplementation Libs.espressoCore
+    androidTestImplementation Libs.composeUiTest
+    debugImplementation Libs.composeUiTooling
+    //Retrofit and Gson
+    implementation Libs.retrofit
+    implementation Libs.retrofitConverter
+    implementation Libs.gson
+    //Lifecycle
+    implementation Libs.lifecycleFragment
+    implementation Libs.lifecycleCommon
+    implementation Libs.lifecycleViewModel
+    implementation Libs.lifecycleRunTime
+    //Coroutines
+    implementation Libs.coroutinesCore
+    implementation Libs.coroutinesAndroid
+    //Room
+    kapt Libs.roomCompiler
+    implementation Libs.roomKtx
+    implementation Libs.roomRuntime
+    //Coil
+    implementation Libs.coilCompose
+    //Dagger Hilt
+    kapt Libs.hiltCompiler
+    implementation Libs.hiltAndroid
+    implementation Libs.hiltViewModel
+}
