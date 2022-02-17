@@ -18,7 +18,7 @@ class CharacterDetailViewModel @Inject constructor(
     private val favoriteCharacterDao: FavoriteCharacterDao
 ) : StatefulViewModel<CharacterDetailState>(CharacterDetailState()) {
 
-    fun fetchCharacter(id: Int) = launch {
+    fun fetchCharacter(id: Int) = launch(notifyProgress = false) {
         val response = characterRepository.getCharacterById(id)
         val favorite = favoriteCharacterDao.getById(response.character.id)
         val isFavorite = favorite != null
@@ -30,18 +30,26 @@ class CharacterDetailViewModel @Inject constructor(
         currentUiState.characterUiModel?.let { characterUiModel ->
             launch(notifyProgress = false) {
                 val character = characterUiModel.character.toFavoriteCharacter()
+                var showSnackBar = false
                 if (characterUiModel.isFavorite) {
+                    showSnackBar = true
                     favoriteCharacterDao.delete(character)
                 } else {
                     favoriteCharacterDao.add(character)
                 }
                 setState {
-                    copy(characterUiModel = characterUiModel.copy(
-                        isFavorite = !characterUiModel.isFavorite
-                    ))
+                    copy(
+                        showSnackBar = showSnackBar,
+                        characterUiModel = characterUiModel
+                            .copy(isFavorite = !characterUiModel.isFavorite)
+                    )
                 }
             }
         }
+    }
+
+    fun snackBarShowed() {
+        setState { copy(showSnackBar = false) }
     }
 
     private fun Character.toFavoriteCharacter(): FavoriteCharacter = FavoriteCharacter(
@@ -56,6 +64,7 @@ class CharacterDetailViewModel @Inject constructor(
     )
 
     data class CharacterDetailState(
-        val characterUiModel: CharacterDetailUiModel? = null
+        val characterUiModel: CharacterDetailUiModel? = null,
+        val showSnackBar: Boolean = false
     ) : UiState
 }

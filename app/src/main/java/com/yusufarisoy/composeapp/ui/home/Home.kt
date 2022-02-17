@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ private fun HomeScreen(
         }
 
         uiState.charactersUiModel?.let {
-            item { Title("Characters", it.characterCount) }
+            item { Title(stringResource(R.string.characters), it.characterCount) }
             items(it.characters.windowed(2, 2, true)) { sublist ->
                 Row(modifier = Modifier.fillMaxWidth()) {
                     sublist.forEach { character ->
@@ -105,7 +106,7 @@ private fun HomeScreen(
 
 @Composable
 private fun Header(locationsUiModel: LocationsUiModelMapper.LocationsUiModel) {
-    Title("Popular Locations", 20)
+    Title(stringResource(R.string.popular_locations), 20)
     Spacer(modifier = Modifier.height(8.dp))
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -166,7 +167,7 @@ private fun CharacterCard(character: Character, isExpanded: Boolean, onExpandCli
             .padding(horizontal = 1.dp)) {
             Icon(
                 painterResource(R.drawable.ic_circle),
-                contentDescription = "",
+                contentDescription = character.name,
                 tint = color,
                 modifier = Modifier.scale(0.6f)
             )
@@ -181,9 +182,9 @@ private fun CharacterCard(character: Character, isExpanded: Boolean, onExpandCli
 
         IconButton(onClick = { onExpandClicked() }) {
             if (isExpanded.not()) {
-                Icon(Icons.Filled.KeyboardArrowDown, "")
+                Icon(Icons.Filled.KeyboardArrowDown, stringResource(R.string.expand))
             } else {
-                Icon(Icons.Filled.KeyboardArrowUp, "")
+                Icon(Icons.Filled.KeyboardArrowUp, stringResource(R.string.collapse))
             }
         }
     }

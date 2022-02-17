@@ -2,6 +2,7 @@ package com.yusufarisoy.composeapp.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
@@ -29,6 +30,7 @@ import kotlinx.coroutines.FlowPreview
 fun NavigationHost(
     mainViewModel: MainViewModel,
     navController: NavHostController,
+    scaffoldState: ScaffoldState,
     paddingValues: PaddingValues
 ) {
     NavHost(
@@ -68,7 +70,11 @@ fun NavigationHost(
             )
         ) {
             val viewModel = hiltViewModel<CharacterDetailViewModel>()
-            CharacterDetail(viewModel, it.arguments?.getInt(NavigationGraph.CharacterDetail.characterId))
+            val characterId = it.arguments?.getInt(NavigationGraph.CharacterDetail.characterId)
+            characterId?.let { id ->
+                viewModel.fetchCharacter(id)
+            }
+            CharacterDetail(viewModel, scaffoldState)
         }
     }
 }

@@ -4,19 +4,18 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,26 +27,27 @@ import com.yusufarisoy.composeapp.ui.characterdetail.CharacterDetailViewModel.Ch
 import com.yusufarisoy.composeapp.ui.theme.Black800
 import com.yusufarisoy.composeapp.ui.theme.Gray600
 import com.yusufarisoy.composeapp.utils.PageContent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun CharacterDetail(
     viewModel: CharacterDetailViewModel,
-    characterId: Int?
+    scaffoldState: ScaffoldState
 ) {
     val state = viewModel.stateFlow.value
-    characterId?.let { id ->
-        viewModel.fetchCharacter(id)
-    }
     PageContent(isLoading = state.progress) {
-        CharacterDetailPage(viewModel, state.uiState)
+        CharacterDetailPage(viewModel, state.uiState, scaffoldState)
     }
 }
 
 @Composable
 private fun CharacterDetailPage(
     viewModel: CharacterDetailViewModel,
-    uiState: CharacterDetailState
+    uiState: CharacterDetailState,
+    scaffoldState: ScaffoldState
 ) {
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,6 +60,14 @@ private fun CharacterDetailPage(
                 uiState.characterUiModel.isFavorite,
                 viewModel::onFavoriteClicked
             )
+        }
+    }
+
+    if (uiState.showSnackBar) {
+        val character = uiState.characterUiModel?.character?.name
+        character?.let {
+            showSnackBar(scope, scaffoldState, it, viewModel::onFavoriteClicked)
+            viewModel.snackBarShowed()
         }
     }
 }
@@ -98,7 +106,7 @@ private fun Character(
                 IconButton(onClick = onFavoriteClicked) {
                     Icon(
                         imageVector = Icons.Filled.Favorite,
-                        contentDescription = "Add to favorites",
+                        contentDescription = stringResource(R.string.add_to_favorites),
                         tint = if (isFavorite) Color.Red else Gray600,
                         modifier = Modifier.scale(1.3f)
                     )
@@ -122,6 +130,23 @@ private fun Character(
             Text(text = "Gender: ${character.gender}", fontSize = 16.sp)
             Text(text = "Created at: ${character.created.slice(0..8)}}", fontSize = 16.sp)
             Text(text = "Last known location: ${character.location.name}", fontSize = 16.sp)
+        }
+    }
+}
+
+private fun showSnackBar(
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState,
+    character: String,
+    onActionPerformed: () -> Unit
+) {
+    scope.launch {
+        val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
+            message = "$character is removed from favorites.",
+            actionLabel = "Undo"
+        )
+        if (snackBarResult == SnackbarResult.ActionPerformed) {
+            onActionPerformed()
         }
     }
 }

@@ -22,10 +22,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.yusufarisoy.composeapp.R
 import com.yusufarisoy.composeapp.data.User
 import com.yusufarisoy.composeapp.ui.theme.Black800
 import com.yusufarisoy.composeapp.ui.theme.Gray700
@@ -40,8 +42,9 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 fun App(mainViewModel: MainViewModel) {
     val scope = rememberCoroutineScope()
-    val navController = rememberNavController()
     val state = mainViewModel.stateFlow.value
+    val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
     val backButtonState = rememberSaveable { mutableStateOf(true) }
     val drawerState = rememberBottomDrawerState(initialValue = BottomDrawerValue.Closed)
 
@@ -54,6 +57,7 @@ fun App(mainViewModel: MainViewModel) {
         drawerContent = { DrawerContent(scope, drawerState, backButtonState) }
     ) {
         Scaffold(
+            scaffoldState = scaffoldState,
             topBar = { TopBar(state.uiState.user, navController, backButtonState) },
             floatingActionButton = { AddPostFAB { scope.launch { drawerState.open() } } },
             floatingActionButtonPosition = FabPosition.Center,
@@ -66,7 +70,7 @@ fun App(mainViewModel: MainViewModel) {
                 )
             }
         ) { paddingValues ->
-            NavigationHost(mainViewModel, navController, paddingValues)
+            NavigationHost(mainViewModel, navController, scaffoldState, paddingValues)
         }
     }
 }
@@ -82,7 +86,7 @@ fun TopBar(
         elevation = 6.dp,
         backgroundColor = Black800,
         modifier = Modifier.height(58.dp),
-        title = { Text(text = "Compose App", color = Color.White) },
+        title = { Text(text = stringResource(R.string.app_name), color = Color.White) },
         navigationIcon = {
             AnimatedVisibility(
                 visible = backButtonState.value,
@@ -90,7 +94,11 @@ fun TopBar(
                 exit = fadeOut()
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Filled.ArrowBack, "Profile", tint = Color.White)
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.profile),
+                        tint = Color.White
+                    )
                 }
             }
         },
@@ -104,7 +112,7 @@ fun TopBar(
             }) {
                 Icon(
                     imageVector = Icons.Filled.Person,
-                    contentDescription = "Profile",
+                    contentDescription = stringResource(R.string.profile),
                     tint = Color.White
                 )
             }
@@ -145,7 +153,7 @@ fun AddPostFAB(buttonClicked: () -> Unit) {
     FloatingActionButton(onClick = { buttonClicked() }, backgroundColor = Gray800) {
         Icon(
             imageVector = Icons.Filled.Add,
-            contentDescription = "New Post",
+            contentDescription = stringResource(R.string.new_post),
             modifier = Modifier.size(35.dp)
         )
     }
@@ -168,8 +176,8 @@ fun DrawerContent(
             backButtonState.value = !backButtonState.value
         }
     ) {
-        Icon(imageVector = Icons.Filled.Add, contentDescription = "New post")
-        Text(text = "New Post")
+        Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.new_post))
+        Text(text = stringResource(R.string.new_post))
     }
     Button(
         shape = RectangleShape,
@@ -178,7 +186,7 @@ fun DrawerContent(
             .height(60.dp),
         onClick = { scope.launch { drawerState.close() } }
     ) {
-        Icon(imageVector = Icons.Filled.Send, contentDescription = "New story")
-        Text(text = "New Story")
+        Icon(imageVector = Icons.Filled.Send, contentDescription = stringResource(R.string.new_story))
+        Text(text = stringResource(R.string.new_story))
     }
 }

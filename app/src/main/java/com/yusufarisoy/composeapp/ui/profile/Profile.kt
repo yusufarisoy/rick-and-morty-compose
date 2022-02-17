@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,12 +51,11 @@ fun Profile(
 ) {
     viewModel.fetchUser(userId)
     val state = viewModel.stateFlow.value
-    val showDialog = remember { mutableStateOf(false) }
     PageContent(
         isLoading = state.progress,
         modifier = Modifier.fillMaxSize()
     ) {
-        ProfilePage(viewModel, paddingValues, state.uiState, showDialog)
+        ProfilePage(viewModel, paddingValues, state.uiState)
     }
 }
 
@@ -64,9 +64,10 @@ fun Profile(
 private fun ProfilePage(
     viewModel: ProfileViewModel,
     paddingValues: PaddingValues,
-    uiState: ProfileState,
-    showDialog: MutableState<Boolean>
+    uiState: ProfileState
 ) {
+    val showDialog = remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -87,20 +88,8 @@ private fun ProfilePage(
             }
         }
     }
-    if (showDialog.value) {
-        ShowDialog(
-            title = "Clear Favorites",
-            text = "Do you really want to clear your favorites?",
-            onDismissed = { showDialog.value = false },
-            negativeButtonText = "No",
-            positiveButtonText = "Yes",
-            onNegativeButtonClicked = { showDialog.value = false },
-            onPositiveButtonClicked = {
-                showDialog.value = false
-                viewModel.clearFavorites()
-            },
-        )
-    }
+
+    ClearFavoritesDialog(showDialog, viewModel::clearFavorites)
 }
 
 @Composable
@@ -138,7 +127,7 @@ private fun ProfileCard(user: User) {
 @Composable
 private fun EmptyState() {
     Text(
-        text = "Mark your favorite characters and see them here!",
+        text = stringResource(R.string.profile_empty_state),
         style = TextStyle(Black800, 16.sp, FontWeight.Bold)
     )
     Image(
@@ -161,13 +150,17 @@ private fun ResultState(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Favorites",
+            text = stringResource(R.string.favorites),
             modifier = Modifier
                 .padding(horizontal = 8.dp),
             style = TextStyle(Black800, 16.sp, FontWeight.Bold)
         )
         IconButton(onClick = onClearClicked) {
-            Icon(imageVector = Icons.Filled.Delete, contentDescription = "", tint = Gray700)
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = stringResource(R.string.delete),
+                tint = Gray700
+            )
         }
     }
     LazyColumn {
@@ -207,7 +200,7 @@ private fun FavoriteCharacterCard(
             ) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Description",
+                    contentDescription = stringResource(R.string.delete),
                     modifier = Modifier.scale(scale)
                 )
             }
@@ -236,5 +229,23 @@ private fun FavoriteCharacterCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ClearFavoritesDialog(showDialog: MutableState<Boolean>, onCleared: () -> Unit) {
+    if (showDialog.value) {
+        ShowDialog(
+            title = stringResource(R.string.clear_favorites),
+            text = stringResource(R.string.clear_favorites_text),
+            onDismissed = { showDialog.value = false },
+            negativeButtonText = stringResource(R.string.no),
+            positiveButtonText = stringResource(R.string.yes),
+            onNegativeButtonClicked = { showDialog.value = false },
+            onPositiveButtonClicked = {
+                showDialog.value = false
+                onCleared()
+            }
+        )
     }
 }

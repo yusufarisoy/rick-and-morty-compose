@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -92,7 +93,7 @@ private fun SearchView(searchQuery: String, onQueryChanged: (query: String) -> U
         value = searchQuery,
         singleLine = true,
         onValueChange = { value -> onQueryChanged(value) },
-        placeholder = { Text(text = "Search...") },
+        placeholder = { Text(stringResource(R.string.search)) },
         shape = RoundedCornerShape(16.dp),
         textStyle = TextStyle(fontSize = 17.sp, color = Black800),
         leadingIcon = { Icon(Icons.Filled.Search, null, tint = Color.Gray) },
@@ -110,11 +111,11 @@ private fun SearchView(searchQuery: String, onQueryChanged: (query: String) -> U
 
 @Composable
 private fun EmptyState() {
-    Text(text = "Search for any Rick and Morty character!", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    Text(text = stringResource(R.string.search_default_state), fontWeight = FontWeight.Bold, fontSize = 16.sp)
     Image(
         painter = painterResource(id = R.drawable.search_holder),
         modifier = Modifier.fillMaxWidth(),
-        contentDescription = ""
+        contentDescription = stringResource(R.string.search_default_state)
     )
 }
 
